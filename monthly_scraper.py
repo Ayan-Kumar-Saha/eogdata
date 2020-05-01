@@ -91,6 +91,13 @@ def download_files(years):
                         print(f'\nSearching "{file_path}" in the current directory -> ', end = '')
                         time.sleep(1)
 
+                        download_site_response = requests.get(records[year][month][tilename][name], stream = True)
+                        download_site_response.raise_for_status()
+
+                        total_length = int(download_site_response.headers.get('content-length'))
+
+                        # print(f'total length: -> {total_length}')
+
                         try :
 
                             if not os.path.exists(file_path):
@@ -98,13 +105,9 @@ def download_files(years):
                                 print("NOT FOUND\n")
                                 time.sleep(1)
 
-                                print(f'\nDownloading "{file_path}"...')
-
-                                download_site_response = requests.get(records[year][month][tilename][name], stream = True)
-                                download_site_response.raise_for_status()
+                                print(f'\nDownloading "{file_path}"...\n')
 
                                 with open(file_path, 'wb') as file:
-                                    total_length = int(download_site_response.headers.get('content-length'))
                                     
                                     for chunk in progress.bar(download_site_response.iter_content(chunk_size=100000), expected_size=(total_length/100000) + 1):
                                         if chunk:
@@ -113,10 +116,27 @@ def download_files(years):
 
                                 print(f'\n"{file_path}" DOWNLOAD STATUS: OK!!')
 
-                            else:
+                            else: 
 
-                                print('FOUND\n')
-                                time.sleep(1)
+                                file_size = os.stat(f'{file_path}')[6]
+
+                                if file_size != total_length:
+
+                                    print('INCOMPLETE/CURRUPTED FILE!')
+
+                                    print(f'\n"Re-downloding {file_path}"...\n')
+
+                                    with open(file_path, 'wb') as file:
+                                        
+                                        for chunk in progress.bar(download_site_response.iter_content(chunk_size=100000), expected_size=(total_length/100000) + 1):
+                                            if chunk:
+                                                file.write(chunk)
+                                                file.flush()
+
+                                else:
+
+                                    print('FOUND\n')
+                                    time.sleep(1)
 
                         except:
 
@@ -129,8 +149,6 @@ def download_files(years):
 def main():
 
     collect_download_links()
-
-    # pprint.pprint(records)
 
     while True:
 
