@@ -5,7 +5,9 @@ import os
 import time
 from clint.textui import progress
 
+site_data = 'https://eogdata.mines.edu/pages/download_dnb_composites_iframe.html'
 records = dict()
+
 
 def collect_download_links():
 
@@ -37,6 +39,8 @@ def collect_download_links():
 def download_files(years):
 
     global records
+    print(years)
+    print(records)
 
     for year in years:
 
@@ -96,6 +100,7 @@ def download_files(years):
 
 def main():
 
+    # check_site_data_updates()
     collect_download_links()
 
     while True:

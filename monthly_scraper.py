@@ -5,7 +5,9 @@ import os
 import time
 from clint.textui import progress
 
+site_data = 'https://eogdata.mines.edu/pages/download_dnb_composites_iframe.html'
 records = dict()
+
 
 def collect_download_links():
 
